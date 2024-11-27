@@ -3,7 +3,7 @@ name: Run Tests
 on:
   pull_request:
     branches:
-      - main  # Target branch for the tests
+      - main
   push:
     branches:
       - main
@@ -13,29 +13,34 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Étape 1: Checkout du code source
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Étape 2: Configurer Java JDK
+      # Étape 1: Configurer Java JDK
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          distribution: 'temurin'  # Utilisez 'temurin' pour OpenJDK
-          java-version: '17'       # Remplacez par la version de Java utilisée dans votre projet
+          distribution: 'temurin'
+          java-version: '17'
+
+      # Étape 2: Forcer l'encodage UTF-8 sur les fichiers source
+      - name: Set file encoding to UTF-8
+        run: |
+          find . -type f -exec dos2unix {} \;  # Convertir les fichiers en format UNIX (si nécessaire)
+          find . -type f -exec iconv -f WINDOWS-1252 -t UTF-8 -o {} {} \; || echo "No conversion needed"
 
       # Étape 3: Installer les dépendances et compiler le projet
       - name: Install dependencies and compile
         run: mvn clean install
 
-      # Étape 4: Lancer les tests
+      # Étape 4: Exécuter les tests
       - name: Run Tests
         run: mvn test
 
-      # Étape 5: (Optionnel) Télécharger les rapports de test
+      # Étape 5: (Optionnel) Télécharger les résultats des tests
       - name: Upload Test Results
         if: always()
         uses: actions/upload-artifact@v3
         with:
           name: test-results
-          path: target/surefire-reports/  # Dossier contenant les rapports Surefire
+          path: target/surefire-reports/
