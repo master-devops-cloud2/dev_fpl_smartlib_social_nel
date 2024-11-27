@@ -1,0 +1,41 @@
+name: Run Tests
+
+on:
+  pull_request:
+    branches:
+      - main  # Target branch for the tests
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Étape 1: Checkout du code source
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Étape 2: Configurer Java JDK
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'  # Utilisez 'temurin' pour OpenJDK
+          java-version: '17'       # Remplacez par la version de Java utilisée dans votre projet
+
+      # Étape 3: Installer les dépendances et compiler le projet
+      - name: Install dependencies and compile
+        run: mvn clean install
+
+      # Étape 4: Lancer les tests
+      - name: Run Tests
+        run: mvn test
+
+      # Étape 5: (Optionnel) Télécharger les rapports de test
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results
+          path: target/surefire-reports/  # Dossier contenant les rapports Surefire
