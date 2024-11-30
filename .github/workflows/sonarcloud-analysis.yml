@@ -40,22 +40,31 @@ jobs:
       - name: Check Maven version
         run: mvn -version
 
-      # Étape 6: Exécuter SonarQube Scanner
-      - name: Run SonarQube analysis
-        uses: sonarsource/sonarcloud-github-action@v2
-        with:
-          sonar-project-key: ${{ secrets.SONAR_PROJECT_KEY }}
-          sonar-org: ${{ secrets.SONAR_ORG }}
-          sonar-token: ${{ secrets.SONAR_TOKEN }}
+      # Étape 6: Ajouter SonarCloud token et organisation via variables d'environnement
+      - name: Set SonarCloud variables
+        run: echo "SONAR_TOKEN=${{ secrets.SONAR_TOKEN }}" >> $GITHUB_ENV
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-      # Étape 7: Compiler le projet avec Maven
+      # Étape 7: Exécuter SonarQube analyse via le scanner
+      - name: Run SonarQube analysis
+        run: |
+          mvn clean verify sonar:sonar \
+            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }} \
+            -Dsonar.organization=${{ secrets.SONAR_ORG }} \
+            -Dsonar.token=${{ secrets.SONAR_TOKEN }} \
+            -Dsonar.host.url=https://sonarcloud.io
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      # Étape 8: Compiler le projet avec Maven
       - name: Build with Maven
         run: mvn clean install
 
-      # Étape 8: Exécuter les tests avec Maven
+      # Étape 9: Exécuter les tests avec Maven
       - name: Run tests with Maven
         run: mvn test
 
-      # Étape 9: Déployer le projet (si nécessaire)
+      # Étape 10: Déployer le projet (si nécessaire)
       - name: Deploy application
         run: echo "Deploying application..."
