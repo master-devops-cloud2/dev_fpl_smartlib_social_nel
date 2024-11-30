@@ -1,4 +1,4 @@
-name: Sonar Build and Maven CI/CD
+name: SonarQube and Build Workflow
 
 on:
   push:
@@ -11,46 +11,50 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
+    
       # Étape 1: Vérifier le code source
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      # Étape 2: Assurer l'encodage correct des fichiers et conversion en UTF-8
-      - name: Set file encoding to UTF-8
-        run: |
-          # Nettoyer les fichiers .properties pour s'assurer qu'ils ont des fins de ligne correctes (Unix)
-          find . -type f -name "*.properties" -exec dos2unix {} \;  # Retirer les fins de ligne Windows
-          # Convertir les fichiers en UTF-8 si l'encodage est incorrect
-          find . -type f -name "*.properties" -exec iconv -f ISO-8859-1 -t UTF-8 -o {} {} \;  # Convertir en UTF-8
-
-      # Étape 3: Définir l'encodage de l'environnement Java pour garantir l'utilisation de UTF-8
-      - name: Set Java environment encoding to UTF-8
-        run: echo "export LANG=en_US.UTF-8" >> $GITHUB_ENV
-
-      # Étape 4: Installer Java 17
+      # Étape 2: Configurer Java 17
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           java-version: '17'
+          distribution: 'adoptopenjdk'  # Distribution JDK
+        env:
+          LANG: en_US.UTF-8
 
-      # Étape 5: Installer Maven
-      - name: Install Maven
-        run: sudo apt-get install maven
-
-      # Étape 6: Construire le projet avec Maven en ignorant le filtrage des ressources si nécessaire
-      - name: Build with Maven (skip resource filtering)
-        run: mvn clean install -Dfiltering=false
-
-      # Étape 7: Exécuter les tests Maven (si vous avez des tests définis)
-      - name: Run tests
-        run: mvn test
-
-      # Étape 8: Exécuter l'analyse SonarQube (Assurez-vous que vous avez un token SonarQube dans vos secrets GitHub)
-      - name: Run SonarQube Analysis
-        uses: sonarsource/sonarcloud-github-action@v2.0.0
+      # Étape 3: Installer Maven
+      - name: Set up Maven
+        uses: actions/setup-maven@v3
         with:
+          maven-version: '3.8.4'  # Version de Maven à utiliser
+
+      # Étape 4: Vérifier la version de Java et Maven
+      - name: Check Java and Maven versions
+        run: |
+          java -version
+          mvn -version
+
+      # Étape 5: Exécuter SonarQube Scanner
+      - name: Run SonarQube analysis
+        uses: sonarsource/sonarcloud-github-action@v2
+        with:
+          sonar-project-key: ${{ secrets.SONAR_PROJECT_KEY }}
+          sonar-org: ${{ secrets.SONAR_ORG }}
           sonar-token: ${{ secrets.SONAR_TOKEN }}
 
-      # Étape 9: Optionnel, vous pouvez ajouter d'autres étapes comme le déploiement ou l'envoi de notifications
+      # Étape 6: Compiler le projet avec Maven
+      - name: Build with Maven
+        run: mvn clean install
+
+      # Étape 7: Exécuter les tests avec Maven
+      - name: Run tests with Maven
+        run: mvn test
+
+      # Étape 8: Déployer le projet (si nécessaire)
+      - name: Deploy application
+        run: echo "Deploying application..."
+
