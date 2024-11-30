@@ -17,28 +17,30 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Étape 2: Configurer Java 17
-      - name: Set up JDK 17
+      # Étape 2: Configurer Java 17 avec Adoptium
+      - name: Set up JDK 17 (Adoptium)
         uses: actions/setup-java@v3
         with:
           java-version: '17'
-          distribution: 'adoptopenjdk'  # Distribution JDK
+          distribution: 'temurin'  # Utiliser 'temurin' au lieu de 'adoptopenjdk'
         env:
           LANG: en_US.UTF-8
 
-      # Étape 3: Installer Maven en utilisant une approche manuelle (si l'action ne fonctionne pas)
+      # Étape 3: Vérifier la version de Java
+      - name: Check Java version
+        run: java -version
+
+      # Étape 4: Installer Maven si nécessaire
       - name: Install Maven
         run: |
           sudo apt-get update
           sudo apt-get install -y maven
 
-      # Étape 4: Vérifier la version de Java et Maven
-      - name: Check Java and Maven versions
-        run: |
-          java -version
-          mvn -version
+      # Étape 5: Vérifier la version de Maven
+      - name: Check Maven version
+        run: mvn -version
 
-      # Étape 5: Exécuter SonarQube Scanner
+      # Étape 6: Exécuter SonarQube Scanner
       - name: Run SonarQube analysis
         uses: sonarsource/sonarcloud-github-action@v2
         with:
@@ -46,15 +48,14 @@ jobs:
           sonar-org: ${{ secrets.SONAR_ORG }}
           sonar-token: ${{ secrets.SONAR_TOKEN }}
 
-      # Étape 6: Compiler le projet avec Maven
+      # Étape 7: Compiler le projet avec Maven
       - name: Build with Maven
         run: mvn clean install
 
-      # Étape 7: Exécuter les tests avec Maven
+      # Étape 8: Exécuter les tests avec Maven
       - name: Run tests with Maven
         run: mvn test
 
-      # Étape 8: Déployer le projet (si nécessaire)
+      # Étape 9: Déployer le projet (si nécessaire)
       - name: Deploy application
         run: echo "Deploying application..."
-
