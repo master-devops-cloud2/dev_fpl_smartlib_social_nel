@@ -26,11 +26,11 @@ jobs:
         env:
           LANG: en_US.UTF-8
 
-      # Étape 3: Installer Maven
-      - name: Set up Maven
-        uses: actions/setup-maven@v3
-        with:
-          maven-version: '3.8.4'  # Version de Maven à utiliser
+      # Étape 3: Installer Maven en utilisant une approche manuelle (si l'action ne fonctionne pas)
+      - name: Install Maven
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y maven
 
       # Étape 4: Vérifier la version de Java et Maven
       - name: Check Java and Maven versions
