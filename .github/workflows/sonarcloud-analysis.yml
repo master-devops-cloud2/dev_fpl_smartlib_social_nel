@@ -22,7 +22,10 @@ jobs:
           java-version: '17'  
           distribution: 'temurin'  
 
-      - name: Install dependencies (Maven example)  
+      - name: Clean Maven directory  
+        run: mvn clean  
+
+      - name: Force UTF-8 Encoding and Install dependencies  
         run: mvn install -Dproject.build.sourceEncoding=UTF-8  
 
       - name: Run SonarQube Scan  
