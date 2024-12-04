@@ -28,6 +28,9 @@
 	</scm>
 	<properties>
 		<java.version>17</java.version>
+		 <sonar.projectKey>master-devops-cloud2_dev_fp_smartlib_socail_nel</sonar.projectKey>
+        	<sonar.organization>master-devops-cloud2</sonar.organization>
+        	<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -81,6 +84,12 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+			<!-- SonarQube Maven Plugin -->
+	            <plugin>
+	                <groupId>org.sonarsource.scanner.maven</groupId>
+	                <artifactId>sonar-maven-plugin</artifactId>
+	                <version>3.9.0.2155</version>
+	            </plugin>
 		</plugins>
 	</build>
 
