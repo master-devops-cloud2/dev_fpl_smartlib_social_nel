@@ -20,6 +20,7 @@ jobs:
         uses: actions/setup-java@v3  
         with:  
           java-version: '17'  
+          distribution: 'temurin'  
       
       - name: Install dependencies (Maven example)  
         run: mvn install  
@@ -30,9 +31,4 @@ jobs:
         run: |  
           mvn sonar:sonar \
             -Dsonar.projectKey=master-devops-cloud2_dev_fp_smartlib_social_nel \
-            -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.organization=master-devops-cloud2 \
-            -Dsonar.login=${{ secrets.SONAR_TOKEN }}  
-
-      - name: Upload Quality Gate Status (Optional)  
-        run: echo "SonarQube Quality Gate Check Complete"
+            -Dsonar.host.url
